@@ -8,7 +8,7 @@ class MyApp(QMainWindow):
         self.mainUI()
         self.setLayout()
         self.setWindowTitle("List App")
-        self.setFixedSize(400, 300)
+        self.setFixedSize(500, 300)
         self.setCentralWidget(self.setWidget)
 
     def mainUI(self):
@@ -21,10 +21,14 @@ class MyApp(QMainWindow):
         # self.buttonDialog = QPushButton("Open Dialog Box")
         # self.buttonInputDialog = QPushButton("Open Input Dialog")
         # self.buttonDialog.clicked.connect(self.setDialog)
-        self.buttonAdd.clicked.connect(self.setInputDialog)
-        self.slider = QSlider()
-        self.Progressbar = QProgressBar()
-        self.Progressbar.setValue(30)
+
+        # logic
+        self.buttonAdd.clicked.connect(self.setInput)
+        self.buttonRemove.clicked.connect(self.setRemove)
+        self.buttonClear.clicked.connect(self.setClear)
+
+        self.slider = QSlider(Qt.Horizontal)
+        self.progressbar = QProgressBar()
 
     def setLayout(self):
         self.layoutList = QVBoxLayout()
@@ -35,7 +39,7 @@ class MyApp(QMainWindow):
         self.layoutList.addWidget(self.buttonClear)
         self.layoutList.addWidget(self.buttonDuplicate)
         self.layoutList.addWidget(self.slider)
-        self.layoutList.addWidget(self.Progressbar)
+        self.layoutList.addWidget(self.progressbar)
 
         self.setWidget = QWidget()
         self.setWidget.setLayout(self.layoutList)
@@ -43,7 +47,7 @@ class MyApp(QMainWindow):
     def setDialog(self):
 
         self.dialog = QDialog()
-        self.dialog.setFixedSize(300, 200)
+        self.dialog.setFixedSize(400, 200)
         self.dialog.setWindowTitle("Custom Dialog Box")
 
         self.labelDialog = QLabel("custom label")
@@ -58,14 +62,34 @@ class MyApp(QMainWindow):
         self.dialog.setLayout(self.layoutDialog)
         self.dialog.exec_()
 
-    def setInputDialog(self):
+    # logic dialog
+
+    def setInput(self):
         self.inputDialog, ok = QInputDialog.getText(
-            self, "Add New List", "add list item")
-        print(f"cek input dialog : {self.inputDialog}")
+            self, "Add List App", "Enter Input")
+        if ok == True:
+            if self.inputDialog != "":
+                self.add = QListWidgetItem(self.inputDialog, self.list)
+                self.list.addItem(self.add)
+                self.progressbar.setValue(self.list.count())
+                print(f"check input dialog : {self.inputDialog}")
         print(ok)
 
-    # def setRemoveDialog(self):
-    #     self.removeDialog, ok = QIn
+    def setRemove(self):
+        listdata_items = self.list.selectedItems()
+        if not listdata_items:
+            return
+        for item in listdata_items:
+            self.list.takeItem(self.list.row(item))
+            self.progressbar.setValue(self.list.count())
+
+    def setClear(self):
+        self.list.clear()
+        self.progressbar.setValue(self.list.count())
+
+    def setUpdate(self):
+        self.list.update()
+        self.progressbar.setValue(self.list.count())
 
 
 if __name__ == "__main__":
