@@ -13,19 +13,20 @@ class MyApp(QMainWindow):
 
     def mainUI(self):
         self.list = QListWidget()
-        self.buttonAdd = QPushButton("Add")
-        self.buttonRemove = QPushButton("Remove")
-        self.buttonUpdate = QPushButton("update")
-        self.buttonClear = QPushButton("clear all")
-        self.buttonDuplicate = QPushButton("duplicate")
-        # self.buttonDialog = QPushButton("Open Dialog Box")
-        # self.buttonInputDialog = QPushButton("Open Input Dialog")
-        # self.buttonDialog.clicked.connect(self.setDialog)
+        self.buttonAddItem = QPushButton("Add Item")
+        self.buttonRemoveItem = QPushButton("Remove Item")
+        self.buttonUpdateItem = QPushButton("update Item")
+        self.buttonClearAllItem = QPushButton("clear all Item")
+        self.buttonDuplicateItem = QPushButton("duplicate Item")
 
-        # logic
-        self.buttonAdd.clicked.connect(self.setInput)
-        self.buttonRemove.clicked.connect(self.setRemove)
-        self.buttonClear.clicked.connect(self.setClear)
+        # logic for progresss Bar
+        self.buttonAddItem.clicked.connect(self.setInput)
+        self.buttonRemoveItem.clicked.connect(self.setRemove)
+        self.buttonClearAllItem.clicked.connect(self.setClear)
+        self.buttonUpdateItem.clicked.connect(self.setUpdate)
+
+        # logic for slider
+        self.buttonDuplicateItem.clicked.connect(self.setDuplicate)
 
         self.slider = QSlider(Qt.Horizontal)
         self.progressbar = QProgressBar()
@@ -33,11 +34,11 @@ class MyApp(QMainWindow):
     def setLayout(self):
         self.layoutList = QVBoxLayout()
         self.layoutList.addWidget(self.list)
-        self.layoutList.addWidget(self.buttonAdd)
-        self.layoutList.addWidget(self.buttonRemove)
-        self.layoutList.addWidget(self.buttonUpdate)
-        self.layoutList.addWidget(self.buttonClear)
-        self.layoutList.addWidget(self.buttonDuplicate)
+        self.layoutList.addWidget(self.buttonAddItem)
+        self.layoutList.addWidget(self.buttonRemoveItem)
+        self.layoutList.addWidget(self.buttonUpdateItem)
+        self.layoutList.addWidget(self.buttonClearAllItem)
+        self.layoutList.addWidget(self.buttonDuplicateItem)
         self.layoutList.addWidget(self.slider)
         self.layoutList.addWidget(self.progressbar)
 
@@ -66,7 +67,7 @@ class MyApp(QMainWindow):
 
     def setInput(self):
         self.inputDialog, ok = QInputDialog.getText(
-            self, "Add List App", "Enter Input")
+            self, "Add to List Item", "Enter Input")
         if ok == True:
             if self.inputDialog != "":
                 self.add = QListWidgetItem(self.inputDialog, self.list)
@@ -88,8 +89,30 @@ class MyApp(QMainWindow):
         self.progressbar.setValue(self.list.count())
 
     def setUpdate(self):
-        self.list.update()
+        dialog_update = QInputDialog()
+        listdata_selected = self.list.selectedItems()
+        index = ['%s' % (i.text()) for i in listdata_selected]
+
+        result, ok = dialog_update.getText(
+            self, "Update List Item", "Update List", text=index[0])
+
+        if ok == True and result != "":
+            for item in listdata_selected:
+                self.list.item(
+                    self.list.row(item)).setText(result)
         self.progressbar.setValue(self.list.count())
+
+    def setDuplicate(self):
+        range_itemselected = self.valuesitem_slider()
+        listdata_selected = ['%s' % (i.text())
+                             for i in self.list.selectedItems()]
+        for x in range(range_itemselected):
+            QListWidgetItem(listdata_selected[0], self.list)
+            self.progressbar.setValue(self.list.count())
+        self.progressbar.setValue(self.list.count())
+
+    def valuesitem_slider(self):
+        return self.slider.value()
 
 
 if __name__ == "__main__":
